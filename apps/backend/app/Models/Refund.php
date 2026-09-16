@@ -73,4 +73,11 @@ class Refund extends Model
     {
         return $this->belongsTo(Branch::class);
     }
+
+    protected $appends = ['sale_receipt_number'];
+
+    public function getSaleReceiptNumberAttribute(): ?string
+    {
+        return $this->sale?->receipt_number;
+    }
 }
