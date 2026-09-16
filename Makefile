@@ -1,7 +1,15 @@
-.PHONY: up down migrate logs ps restart reset shell-backend shell-web seed fresh-test clean help
+.PHONY: up down migrate logs ps restart reset shell-backend shell-web seed clean help test-backend test-frontend lint typecheck
 
 COMPOSE := docker compose
 COMPOSE_FILES := -f docker-compose.yml -f docker-compose.dev.yml
+
+clean: ## Clean up build artifacts
+	@echo "Cleaning up..."
+	rm -rf apps/backend/vendor
+	rm -rf apps/backend/node_modules
+	rm -rf apps/web/node_modules
+	rm -rf packages/*/node_modules
+	rm -rf apps/backend/storage/logs/*.log
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-15s\033[0m %s\n", $$1, $$2}'
@@ -42,6 +50,16 @@ shell-web: ## Open a bash shell in the web container
 
 test-backend: ## Run backend tests
 	$(COMPOSE) $(COMPOSE_FILES) exec -T backend php artisan test
+
+test-frontend: ## Run frontend tests
+	$(COMPOSE) $(COMPOSE_FILES) exec -T web npm run test
+
+lint: ## Run linting for all packages
+	$(COMPOSE) $(COMPOSE_FILES) exec -T backend ./vendor/bin/pint --test
+	$(COMPOSE) $(COMPOSE_FILES) exec -T web npm run lint
+
+typecheck: ## Run type checking for frontend
+	$(COMPOSE) $(COMPOSE_FILES) exec -T web npm run typecheck
 
 health: ## Check API health
 	@curl -s http://localhost:8080/api/v1/health || echo "API not ready yet"

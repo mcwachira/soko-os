@@ -25,7 +25,7 @@ services:
     restart: unless-stopped
 
   web:
-    image: node:22-alpine
+    image: node:22-slim
     container_name: soko-web
     working_dir: /app
     volumes:
