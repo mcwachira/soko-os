@@ -39,7 +39,7 @@ export function useSync(config: SyncConfig) {
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
-    apiClientRef.current = new (require('@/api-client').SokoApiClient)({
+    apiClientRef.current = new (require('@soko/api-client').SokoApiClient)({
       baseUrl: config.apiBaseUrl,
       getToken: config.getToken,
       getDeviceId: () => config.deviceId,

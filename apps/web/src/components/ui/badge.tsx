@@ -1,43 +1,52 @@
-"use client";
-import * as React from "react"
+import { mergeProps } from "@base-ui/react/merge-props"
+import { useRender } from "@base-ui/react/use-render"
 import { cva, type VariantProps } from "class-variance-authority"
+
+import * as React from "react"
 
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-full border-2 border-black px-2.5 py-0.5 text-xs font-bold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 shadow",
+  "inline-flex items-center justify-center rounded-base border-2 border-border px-2.5 py-0.5 text-xs font-base w-fit whitespace-nowrap shrink-0 [&>svg]:size-3 gap-1 [&>svg]:pointer-events-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] overflow-hidden",
   {
     variants: {
       variant: {
-        default:
-          "border-transparent bg-main text-main-foreground shadow",
-        secondary:
-          "border-transparent bg-secondary-background text-foreground hover:bg-black/5 dark:hover:bg-white/5",
-        destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow",
-        outline: "text-foreground border-black",
-        success:
-          "border-transparent bg-success text-success-foreground shadow",
-        warning:
-          "border-transparent bg-warning text-warning-foreground shadow",
-        info:
-          "border-transparent bg-info text-info-foreground shadow",
+        default: "bg-background text-foreground",
+        neutral: "bg-secondary-background text-foreground",
+        secondary: "bg-secondary-background text-foreground",
+        destructive: "bg-destructive text-destructive-foreground",
+        outline: "bg-transparent text-foreground border-2 border-border",
+        success: "bg-success text-success-foreground",
+        warning: "bg-warning text-warning-foreground",
+        info: "bg-info text-info-foreground",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
+  },
 )
 
-export interface BadgeProps
-  extends React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof badgeVariants> {}
-
-function Badge({ className, variant, ...props }: BadgeProps) {
-  return (
-    <div className={cn(badgeVariants({ variant }), className)} {...props} />
-  )
+function Badge({
+  className,
+  variant,
+  render,
+  ...props
+}: useRender.ComponentProps<"span"> & VariantProps<typeof badgeVariants>) {
+  return useRender({
+    defaultTagName: "span",
+    render,
+    props: mergeProps<"span">(
+      {
+        className: cn(badgeVariants({ variant }), className),
+      },
+      props,
+    ),
+    state: {
+      slot: "badge",
+      variant: variant ?? "default",
+    },
+  })
 }
 
 export { Badge, badgeVariants }

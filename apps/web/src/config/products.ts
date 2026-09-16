@@ -46,8 +46,8 @@ export const products = [
     image: '/images/products/inventory.svg',
   },
   {
-    id: 'pay',
-    name: 'Soko Pay',
+    id: 'commerce',
+    name: 'Soko Commerce',
     tagline: 'Accept payments the way your customers prefer',
     description: 'Unified payment processing that supports local mobile money, cards, and bank transfers. Settle funds directly to your business account.',
     features: [
@@ -67,29 +67,6 @@ export const products = [
     integrations: ['Soko POS', 'Soko Books', 'Soko Tax'],
     offlineCapable: false,
     image: '/images/products/pay.svg',
-  },
-  {
-    id: 'tax',
-    name: 'Soko Tax',
-    tagline: 'Stay compliant without the headache',
-    description: 'Automated tax calculations and filing designed for African tax authorities. Generate accurate returns and stay audit-ready.',
-    features: [
-      'Automated VAT/Tax calculation',
-      'KRA eTIMS integration (Kenya)',
-      'SARS eFiling ready (South Africa)',
-      'FIRS integration (Nigeria)',
-      'Tax report generation',
-      'Audit trail and compliance logs',
-    ],
-    benefits: [
-      'Reduce tax preparation time by 80%',
-      'Eliminate calculation errors',
-      'Stay audit-ready 24/7',
-      'Automatic rate updates',
-    ],
-    integrations: ['Soko POS', 'Soko Books', 'Soko Pay'],
-    offlineCapable: true,
-    image: '/images/products/tax.svg',
   },
   {
     id: 'books',
@@ -115,8 +92,8 @@ export const products = [
     image: '/images/products/books.svg',
   },
   {
-    id: 'analytics',
-    name: 'Soko Analytics',
+    id: 'insights',
+    name: 'Soko Insights',
     tagline: 'Turn your data into decisions',
     description: 'Powerful analytics dashboard with sales trends, inventory insights, and business health metrics. Make decisions with confidence.',
     features: [
@@ -138,8 +115,8 @@ export const products = [
     image: '/images/products/analytics.svg',
   },
   {
-    id: 'connect',
-    name: 'Soko Connect',
+    id: 'procurement',
+    name: 'Soko Procurement',
     tagline: 'Integrate everything into one system',
     description: 'Open APIs and webhooks to connect Soko-OS with your existing tools. Build custom integrations or use our pre-built connectors.',
     features: [
@@ -157,6 +134,29 @@ export const products = [
       'Scale without limits',
     ],
     integrations: ['All Soko-OS products', 'Third-party ERP', 'Custom systems'],
+    offlineCapable: true,
+    image: '/images/products/connect.svg',
+  },
+  {
+    id: 'crm',
+    name: 'Soko CRM',
+    tagline: 'Customer relationships that grow your business',
+    description: 'Manage leads, contacts, deals, and customer relationships. Track your sales pipeline and close more deals.',
+    features: [
+      'Lead and contact management',
+      'Deal pipeline tracking',
+      'Activity and task management',
+      'Email and communication tracking',
+      'Sales forecasting',
+      'Customer segmentation',
+    ],
+    benefits: [
+      'Never miss a follow-up',
+      'Close deals faster',
+      'Understand your customers',
+      'Forecast revenue accurately',
+    ],
+    integrations: ['Soko POS', 'Soko Commerce', 'Soko Books'],
     offlineCapable: true,
     image: '/images/products/connect.svg',
   },

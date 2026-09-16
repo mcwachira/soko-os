@@ -1,7 +1,4 @@
 import './globals.css';
-import { ThemeProvider } from '@/providers/theme-provider';
-import { AuthProvider } from '@/hooks/useAuth';
-import { QueryProvider } from '@/hooks/useTanStackQuery';
 
 export const metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'),
@@ -38,13 +35,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen antialiased bg-background text-foreground">
-        <ThemeProvider defaultTheme="system" storageKey="soko-theme">
-          <QueryProvider>
-            <AuthProvider>
-              {children}
-            </AuthProvider>
-          </QueryProvider>
-        </ThemeProvider>
+        {children}
       </body>
     </html>
   );
