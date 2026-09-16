@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: soko_os_test
+          POSTGRES_USER: soko
+          POSTGRES_PASSWORD: soko
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: mbstring, bcmath, pgsql, pdo_pgsql
+          coverage: none
+      - run: composer install --no-interaction --prefer-dist --no-progress
+        working-directory: apps/backend
+      - run: cp apps/backend/.env.example apps/backend/.env
+      - run: |
+          sed -i 's/DB_DATABASE=.*/DB_DATABASE=soko_os_test/' apps/backend/.env
+          sed -i 's/DB_USERNAME=.*/DB_USERNAME=soko/' apps/backend/.env
+          sed -i 's/DB_PASSWORD=.*/DB_PASSWORD=soko/' apps/backend/.env
+      - run: php artisan key:generate --force
+        working-directory: apps/backend
+      - run: php artisan migrate --force --no-interaction
+        working-directory: apps/backend
+      - run: php artisan test --no-progress
+        working-directory: apps/backend
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 11
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter ./apps/web tsc --noEmit
+      - run: pnpm --filter ./apps/web lint

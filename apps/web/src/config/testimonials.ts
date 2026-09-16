@@ -1,0 +1,42 @@
+export const testimonials = [
+  {
+    id: 1,
+    quote: '[PLACEHOLDER]',
+    author: '[PLACEHOLDER]',
+    role: '[PLACEHOLDER]',
+    company: '[PLACEHOLDER]',
+    location: '[PLACEHOLDER]',
+  },
+  {
+    id: 2,
+    quote: '[PLACEHOLDER]',
+    author: '[PLACEHOLDER]',
+    role: '[PLACEHOLDER]',
+    company: '[PLACEHOLDER]',
+    location: '[PLACEHOLDER]',
+  },
+  {
+    id: 3,
+    quote: '[PLACEHOLDER]',
+    author: '[PLACEHOLDER]',
+    role: '[PLACEHOLDER]',
+    company: '[PLACEHOLDER]',
+    location: '[PLACEHOLDER]',
+  },
+  {
+    id: 4,
+    quote: '[PLACEHOLDER]',
+    author: '[PLACEHOLDER]',
+    role: '[PLACEHOLDER]',
+    company: '[PLACEHOLDER]',
+    location: '[PLACEHOLDER]',
+  },
+  {
+    id: 5,
+    quote: '[PLACEHOLDER]',
+    author: '[PLACEHOLDER]',
+    role: '[PLACEHOLDER]',
+    company: '[PLACEHOLDER]',
+    location: '[PLACEHOLDER]',
+  },
+];

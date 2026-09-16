@@ -1,0 +1,36 @@
+{
+  "name": "soko-os",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Soko-OS: The Operating System for African Businesses",
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev --filter=@soko/web",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "pnpm test:packages && pnpm test:frontend && pnpm test:backend",
+    "test:packages": "turbo run test --filter=\"./packages/*\"",
+    "test:frontend": "turbo run test --filter=@soko/web",
+    "test:backend": "docker compose exec -T backend php artisan test",
+    "test:e2e": "docker compose exec -T web pnpm test:e2e",
+    "dev:up": "docker compose up -d --build",
+    "dev:down": "docker compose down",
+    "dev:restart": "docker compose restart",
+    "dev:logs": "docker compose logs -f",
+    "dev:ps": "docker compose ps",
+    "dev:reset": "echo 'DESTRUCTIVE: removing containers and volumes' && docker compose down -v",
+    "db:migrate": "docker compose exec -T backend php artisan migrate --force",
+    "db:seed": "docker compose exec -T backend php artisan db:seed --force",
+    "db:reset": "echo 'DESTRUCTIVE: migrate:fresh --seed' && docker compose exec -T backend php artisan migrate:fresh --seed --force"
+  },
+  "devDependencies": {
+    "fake-indexeddb": "^6.2.5",
+    "turbo": "^2.4.4",
+    "typescript": "^5.8.2",
+    "vitest": "^5.0.0"
+  },
+  "packageManager": "pnpm@11.23.0",
+  "engines": {
+    "node": ">=22"
+  }
+}

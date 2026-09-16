@@ -1,0 +1,55 @@
+# Dependencies
+node_modules
+.pnpm-store
+.pnpm-debug.log*
+
+# Next.js build
+.next
+out
+dist
+build
+
+# Laravel
+apps/backend/vendor
+apps/backend/.env
+apps/backend/bootstrap/cache/*
+!apps/backend/bootstrap/cache/.gitignore
+apps/backend/storage/*.key
+apps/backend/storage/app/*
+!apps/backend/storage/app/.gitignore
+apps/backend/storage/framework/cache/*
+!apps/backend/storage/framework/cache/.gitignore
+apps/backend/storage/framework/sessions/*
+!apps/backend/storage/framework/sessions/.gitignore
+apps/backend/storage/framework/testing/*
+!apps/backend/storage/framework/testing/.gitignore
+apps/backend/storage/framework/views/*
+!apps/backend/storage/framework/views/.gitignore
+apps/backend/storage/logs/*
+!apps/backend/storage/logs/.gitignore
+
+# Environment files
+.env
+.env.local
+.env.production
+.env.docker
+!.env.example
+!.env.docker.example
+
+# Laravel nested git / OS
+apps/backend/.phpunit.result.cache
+apps/backend/auth.json
+
+# Docker volumes
+docker-data/
+
+# IDE & OS
+.DS_Store
+Thumbs.db
+.idea
+.vscode
+*.sublime-project
+*.sublime-workspace
+
+# Turbo cache
+.turbo

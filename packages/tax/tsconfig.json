@@ -1,0 +1,7 @@
+{
+  "extends": "@soko/typescript-config/base.json",
+  "compilerOptions": {
+    "rootDir": "./src"
+  },
+  "include": ["src/**/*"]
+}

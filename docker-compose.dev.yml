@@ -1,0 +1,17 @@
+# Optional development overrides.
+# Usage: docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d
+#
+# Keep this file for local-only tweaks (extra ports, admin tools, verbose logging).
+
+services:
+  backend:
+    environment:
+      LOG_LEVEL: debug
+
+  # Optional DB UI — not required for core operation
+  # adminer:
+  #   image: adminer:latest
+  #   ports:
+  #     - "8081:8080"
+  #   networks:
+  #     - soko-network

@@ -1,0 +1,14 @@
+.git
+.idea
+.vscode
+.turbo
+.pnpm-store
+**/node_modules
+**/vendor
+**/.next
+**/dist
+**/.env
+**/.env.local
+docs
+*.md
+.vtcode

@@ -1,0 +1,13 @@
+{
+  "name": "@soko/domain-types",
+  "version": "1.0.0",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@soko/typescript-config": "workspace:*",
+    "typescript": "^5.8.2"
+  }
+}
