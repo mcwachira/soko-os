@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\BankTransaction;
 use App\Http\Requests\StoreBankTransactionRequest;
+use App\Http\Requests\UpdateBankTransactionRequest;
 use Illuminate\Http\Request;
 
 class BankTransactionController extends Controller
@@ -83,5 +84,19 @@ class BankTransactionController extends Controller
         $transaction->delete();
 
         return response()->json(['message' => 'Bank transaction deleted']);
+    }
+
+    public function update(UpdateBankTransactionRequest $request, string $id)
+    {
+        $transaction = BankTransaction::where('organization_id', request()->user()->organization_id)
+            ->findOrFail($id);
+
+        $this->authorize('update', $transaction);
+
+        $validated = $request->validated();
+
+        $transaction->update($validated);
+
+        return response()->json(['data' => $transaction->load('bankAccount', 'journalEntry')]);
     }
 }

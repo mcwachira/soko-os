@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Expense;
 use App\Http\Requests\StoreExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
+use App\Services\Accounting\JournalService;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -110,5 +111,27 @@ class ExpenseController extends Controller
         $expense->delete();
 
         return response()->json(['message' => 'Expense deleted']);
+    }
+
+    public function approve(Request $request, string $id, JournalService $journalService)
+    {
+        $expense = Expense::where('organization_id', $request->user()->organization_id)
+            ->findOrFail($id);
+
+        $this->authorize('update', $expense);
+
+        if (in_array($expense->status, ['approved', 'paid', 'reimbursed'])) {
+            return response()->json(['message' => 'Expense is already approved or paid'], 422);
+        }
+
+        $expense->update([
+            'status' => 'approved',
+            'approved_by_user_id' => $request->user()->id,
+            'approved_at' => now(),
+        ]);
+
+        $journalService->postExpenseJournal($expense->organization_id, $expense->business_id, $expense);
+
+        return response()->json(['data' => $expense->load('category', 'account', 'bankAccount', 'supplier', 'createdBy', 'approvedBy')]);
     }
 }

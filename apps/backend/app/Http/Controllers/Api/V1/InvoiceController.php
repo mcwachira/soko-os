@@ -7,6 +7,7 @@ use App\Models\Invoice;
 use App\Models\InvoiceItem;
 use App\Http\Requests\StoreInvoiceRequest;
 use App\Http\Requests\UpdateInvoiceRequest;
+use App\Services\Accounting\JournalService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -189,5 +190,26 @@ class InvoiceController extends Controller
         $invoice->delete();
 
         return response()->json(['message' => 'Invoice deleted']);
+    }
+
+    public function issue(Request $request, string $id, JournalService $journalService)
+    {
+        $invoice = Invoice::where('organization_id', $request->user()->organization_id)
+            ->findOrFail($id);
+
+        $this->authorize('update', $invoice);
+
+        if ($invoice->status !== 'draft') {
+            return response()->json(['message' => 'Invoice is not in draft status'], 422);
+        }
+
+        $invoice->update([
+            'status' => 'sent',
+            'issue_date' => $invoice->issue_date ?? now()->toDateString(),
+        ]);
+
+        $journalService->postInvoiceJournal($invoice->organization_id, $invoice->business_id, $invoice);
+
+        return response()->json(['data' => $invoice->load('items.product')]);
     }
 }
