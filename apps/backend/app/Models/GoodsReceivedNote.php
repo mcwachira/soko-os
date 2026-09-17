@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class GoodsReceivedNote extends Model
@@ -12,7 +13,6 @@ class GoodsReceivedNote extends Model
     use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
-        'id',
         'organization_id',
         'business_id',
         'branch_id',
@@ -59,7 +59,7 @@ class GoodsReceivedNote extends Model
         return $this->belongsTo(User::class, 'received_by_user_id');
     }
 
-    public function items()
+    public function lines()
     {
         return $this->hasMany(GoodsReceivedNoteItem::class);
     }
