@@ -56,3 +56,5 @@ export function ThemeToggle() {
     </DropdownMenu>
   );
 }
+
+export { ThemeToggle as default } from './theme-toggle';

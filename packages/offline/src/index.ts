@@ -1,9 +1,18 @@
 import Dexie, { Table } from 'dexie';
-import { Product, ProductCategory, Customer, Sale, InventoryMovement, SyncPushPayload, ReturnModel, Refund, PaymentTransaction, CashShift } from '@soko/domain-types';
+import { Product, ProductCategory, Customer, Sale, InventoryMovement, SyncPushPayload, ReturnModel, Refund, PaymentTransaction, CashShift, Cart, CartItem } from '@soko/domain-types';
 
 export interface LocalSyncMetadata {
   key: string;
   value: string;
+  updated_at: string;
+}
+
+export interface LocalCart {
+  id: string;
+  items: CartItem[];
+  customer_id?: string;
+  discount_minor: number;
+  notes?: string;
   updated_at: string;
 }
 
@@ -19,6 +28,7 @@ export class SokoOfflineDatabase extends Dexie {
   inventory_movements!: Table<InventoryMovement, string>;
   sync_operations!: Table<SyncPushPayload['operations'][0], string>;
   sync_metadata!: Table<LocalSyncMetadata, string>;
+  carts!: Table<LocalCart, string>;
 
   constructor(databaseName = 'SokoOS_OfflineDB') {
     super(databaseName);
@@ -35,6 +45,7 @@ export class SokoOfflineDatabase extends Dexie {
       inventory_movements: 'id, product_id, movement_type, reference_id, created_at',
       sync_operations: 'operation_id, idempotency_key, entity_name, action, local_id, created_at',
       sync_metadata: 'key',
+      carts: 'id, updated_at',
     });
   }
 }

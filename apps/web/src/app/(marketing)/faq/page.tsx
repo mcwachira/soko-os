@@ -32,7 +32,7 @@ export default function FAQPage() {
             {faqs.map((group) => (
               <div key={group.category}>
                 <h2 className="text-xl font-black mb-4">{group.category}</h2>
-                <Accordion type="single" collapsible className="border-2 border-black rounded-xl shadow overflow-hidden">
+                <Accordion multiple={false} className="border-2 border-black rounded-xl shadow overflow-hidden">
                   {group.questions.map((item, idx) => (
                     <AccordionItem key={item.question} value={`${group.category}-${idx}`} className="border-b-2 border-black last:border-0">
                       <AccordionTrigger className="px-4 py-4 font-black text-left hover:bg-black/5 dark:hover:bg-white/5">

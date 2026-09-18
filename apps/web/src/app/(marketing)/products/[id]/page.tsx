@@ -94,8 +94,13 @@ export default async function ProductPage({ params }: { params: Promise<{ id: st
               {product.description}
             </p>
             <div className="mt-8 flex flex-col sm:flex-row gap-4">
-              <Link href="#request-demo">
+              <Link href={`/login?redirect=/dashboard&product=${id}`}>
                 <Button size="lg" className="w-full sm:w-auto shadow">
+                  Launch App <ArrowRight className="ml-2 h-5 w-5" />
+                </Button>
+              </Link>
+              <Link href="#request-demo">
+                <Button variant="secondary" size="lg" className="w-full sm:w-auto shadow">
                   Request a Demo <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>

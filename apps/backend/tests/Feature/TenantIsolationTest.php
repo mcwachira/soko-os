@@ -246,4 +246,34 @@ class TenantIsolationTest extends TestCase
             'status' => 'active',
         ]);
     }
+
+    public function test_tenant_cannot_access_other_tenant_project(): void
+    {
+        $orgA = Organization::factory()->create();
+        $orgB = Organization::factory()->create();
+
+        $userA = $this->actingAsAdminOf($orgA);
+        $this->actingAsAdminOf($orgB);
+
+        $project = \App\Models\Project::factory()->create([
+            'organization_id' => $orgA->id,
+            'business_id' => $userA->business_id,
+        ]);
+
+        Sanctum::actingAs($userA);
+
+        $response = $this->getJson("/api/v1/projects/{$project->id}");
+        $response->assertStatus(200);
+
+        $userB = User::factory()->create([
+            'organization_id' => $orgB->id,
+            'business_id' => Business::factory()->create(['organization_id' => $orgB->id])->id,
+            'role' => 'admin',
+            'permissions' => ['*'],
+        ]);
+        Sanctum::actingAs($userB);
+
+        $response = $this->getJson("/api/v1/projects/{$project->id}");
+        $response->assertStatus(404);
+    }
 }
