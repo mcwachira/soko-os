@@ -1,0 +1,104 @@
+/* Soko Procurement - Lime Theme */
+/* Light Theme */
+[data-product="procurement"] {
+  --background: hsl(204, 100%, 80%);
+  --secondary-background: oklch(100% 0 0);
+  --foreground: oklch(0% 0 0);
+  --main-foreground: oklch(0% 0 0);
+  --main: hsl(84, 100%, 45%);
+  --border: oklch(0% 0 0);
+  --ring: oklch(0% 0 0);
+  --overlay: oklch(0% 0 0 / 0.8);
+  --shadow: 4px 4px 0px 0px var(--border);
+
+  --chart-1: #84CC16;
+  --chart-2: #65A30D;
+  --chart-3: #4D7C0F;
+  --chart-4: #3F6212;
+  --chart-5: #365314;
+  --chart-active-dot: #000;
+
+  --success: 79% 0.17 142;
+  --success-foreground: 0% 0 0;
+  --warning: 92% 0.19 95;
+  --warning-foreground: 0% 0 0;
+  --destructive: 63% 0.2 27;
+  --destructive-foreground: 100% 0 0;
+  --info: 82% 0.1 190;
+  --info-foreground: 0% 0 0;
+  --muted: 96% 0 0;
+  --muted-foreground: 56% 0 0;
+  --card: 100% 0 0;
+  --card-foreground: 0% 0 0;
+  --popover: 100% 0 0;
+  --popover-foreground: 0% 0 0;
+  --input: 0% 0 0;
+
+  --sidebar-background: 100% 0 0;
+  --sidebar-foreground: 0% 0 0;
+  --sidebar-primary: hsl(84, 100%, 45%);
+  --sidebar-primary-foreground: 0% 0 0;
+  --sidebar-accent: hsl(204, 100%, 80%);
+  --sidebar-accent-foreground: 0% 0 0;
+  --sidebar-border: oklch(0% 0 0);
+  --sidebar-ring: hsl(84, 100%, 45%);
+
+  --primary: hsl(84, 100%, 45%);
+  --primary-foreground: 0% 0 0;
+  --secondary: 100% 0 0;
+  --secondary-foreground: 0% 0 0;
+  --accent: hsl(204, 100%, 80%);
+  --accent-foreground: 0% 0 0;
+}
+
+/* Dark Theme */
+[data-product="procurement"].dark {
+  --background: hsl(84, 30%, 8%);
+  --secondary-background: hsl(84, 30%, 12%);
+  --foreground: oklch(98% 0 0);
+  --main-foreground: oklch(0% 0 0);
+  --main: hsl(84, 100%, 50%);
+  --border: oklch(90% 0 0);
+  --ring: oklch(90% 0 0);
+  --overlay: oklch(0% 0 0 / 0.8);
+  --shadow: 4px 4px 0px 0px var(--border);
+
+  --chart-1: #A3E635;
+  --chart-2: #84CC16;
+  --chart-3: #65A30D;
+  --chart-4: #4D7C0F;
+  --chart-5: #3F6212;
+  --chart-active-dot: #fff;
+
+  --success: 79% 0.17 142;
+  --success-foreground: 0% 0 0;
+  --warning: 92% 0.19 95;
+  --warning-foreground: 0% 0 0;
+  --destructive: 63% 0.2 27;
+  --destructive-foreground: 100% 0 0;
+  --info: 71% 0.1 190;
+  --info-foreground: 100% 0 0;
+  --muted: hsl(84, 30%, 15%);
+  --muted-foreground: oklch(70% 0 0);
+  --card: hsl(84, 30%, 12%);
+  --card-foreground: oklch(98% 0 0);
+  --popover: hsl(84, 30%, 12%);
+  --popover-foreground: oklch(98% 0 0);
+  --input: oklch(90% 0 0);
+
+  --sidebar-background: hsl(84, 30%, 8%);
+  --sidebar-foreground: oklch(98% 0 0);
+  --sidebar-primary: hsl(84, 100%, 50%);
+  --sidebar-primary-foreground: 0% 0 0;
+  --sidebar-accent: hsl(84, 30%, 12%);
+  --sidebar-accent-foreground: oklch(98% 0 0);
+  --sidebar-border: oklch(90% 0 0);
+  --sidebar-ring: hsl(84, 100%, 50%);
+
+  --primary: hsl(84, 100%, 50%);
+  --primary-foreground: 0% 0 0;
+  --secondary: hsl(84, 30%, 12%);
+  --secondary-foreground: oklch(98% 0 0);
+  --accent: hsl(84, 30%, 12%);
+  --accent-foreground: oklch(98% 0 0);
+}
