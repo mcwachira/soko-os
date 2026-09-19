@@ -5,13 +5,14 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PurchaseOrderItem extends Model
 {
-    use HasUuids;
+    use HasFactory, HasUuids;
 
     protected $fillable = [
-        'id',
+        'organization_id',
         'purchase_order_id',
         'product_id',
         'sku',
@@ -28,22 +29,32 @@ class PurchaseOrderItem extends Model
 
     protected $casts = [
         'quantity' => 'decimal:4',
-        'received_quantity' => 'decimal:4',
         'unit_price_minor' => 'integer',
         'discount_minor' => 'integer',
         'tax_rate_percentage' => 'decimal:2',
         'tax_amount_minor' => 'integer',
         'subtotal_minor' => 'integer',
         'total_minor' => 'integer',
+        'received_quantity' => 'decimal:4',
     ];
 
-    public function purchaseOrder()
+    public function purchaseOrder(): BelongsTo
     {
         return $this->belongsTo(PurchaseOrder::class);
     }
 
-    public function product()
+    public function product(): BelongsTo
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function grnLines()
+    {
+        return $this->hasMany(GoodsReceivedNoteItem::class);
+    }
+
+    public function invoiceLines()
+    {
+        return $this->hasMany(SupplierInvoiceLine::class);
     }
 }

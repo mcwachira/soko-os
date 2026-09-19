@@ -421,28 +421,20 @@ class PurchasingController extends Controller
             return;
         }
 
-        $warehouseId = $grn->warehouse_id;
-        $lastMovement = \App\Models\InventoryMovement::where('product_id', $poItem->product_id)
-            ->when($warehouseId, fn ($q) => $q->where('warehouse_id', $warehouseId))
-            ->latest('created_at')
-            ->first();
+        $warehouse = \App\Models\Warehouse::find($grn->warehouse_id);
 
-        $balanceAfter = ($lastMovement?->balance_after ?? 0) + $qtyReceived;
-
-        \App\Models\InventoryMovement::create([
-            'id' => Str::uuid()->toString(),
-            'organization_id' => $grn->organization_id,
-            'business_id' => $grn->business_id,
-            'branch_id' => $grn->branch_id,
-            'warehouse_id' => $warehouseId,
-            'product_id' => $poItem->product_id,
-            'movement_type' => 'purchase',
-            'quantity_change' => $qtyReceived,
-            'balance_after' => $balanceAfter,
-            'reference_type' => 'grn',
-            'reference_id' => $grn->id,
-            'notes' => 'GRN ' . $grn->grn_number . ' - ' . $poItem->name,
-            'created_by_user_id' => $user->id,
-        ]);
+        \App\Services\InventoryService::recordMovement(
+            $product,
+            $warehouse,
+            'purchase_receive',
+            $qtyReceived,
+            [
+                'branch_id' => $grn->branch_id,
+                'reference_type' => 'grn',
+                'reference_id' => $grn->id,
+                'notes' => 'GRN ' . $grn->grn_number . ' - ' . $poItem->name,
+                'user_id' => $user->id,
+            ]
+        );
     }
 }
