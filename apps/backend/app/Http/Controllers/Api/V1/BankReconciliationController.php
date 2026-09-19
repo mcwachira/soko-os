@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Models\BankReconciliation;
 use App\Http\Requests\StoreBankReconciliationRequest;
+use App\Http\Requests\UpdateBankReconciliationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -79,5 +80,26 @@ class BankReconciliationController extends Controller
         $reconciliation->delete();
 
         return response()->json(['message' => 'Bank reconciliation deleted']);
+    }
+
+    public function update(UpdateBankReconciliationRequest $request, string $id)
+    {
+        $reconciliation = BankReconciliation::where('organization_id', request()->user()->organization_id)
+            ->findOrFail($id);
+
+        $this->authorize('update', $reconciliation);
+
+        $validated = $request->validated();
+
+        if (isset($validated['statement_balance_minor']) || isset($validated['book_balance_minor'])) {
+            $statementBalance = $validated['statement_balance_minor'] ?? $reconciliation->statement_balance_minor;
+            $bookBalance = $validated['book_balance_minor'] ?? $reconciliation->book_balance_minor;
+            $validated['difference_minor'] = $statementBalance - $bookBalance;
+            $validated['status'] = $validated['difference_minor'] === 0 ? 'completed' : 'pending';
+        }
+
+        $reconciliation->update($validated);
+
+        return response()->json(['data' => $reconciliation->load('bankAccount', 'items')]);
     }
 }

@@ -28,6 +28,8 @@ class StoreSaleRequest extends FormRequest
             'items.*.unit_price_minor' => ['required', 'integer', 'min:0'],
             'items.*.discount_minor' => ['nullable', 'integer', 'min:0'],
             'items.*.tax_rate_percentage' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'items.*.batch_number' => ['nullable', 'string', 'max:100'],
+            'items.*.serial_number' => ['nullable', 'string', 'max:255'],
             'payments' => ['required', 'array', 'min:1'],
             'payments.*.amount_minor' => ['required', 'integer', 'gt:0'],
             'payments.*.payment_method' => ['required', 'string', Rule::in(['cash', 'card', 'mpesa', 'airtel', 'bank', 'credit', 'points'])],

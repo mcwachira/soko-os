@@ -350,4 +350,179 @@ class AccountingIntegrityTest extends TestCase
 
         $this->assertEquals($totalDebits, $totalCredits);
     }
+
+    public function test_credit_note_generates_balanced_journal(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = $this->actingAsAdminOf($organization);
+        $data = $this->seedTenantData($organization, $user);
+
+        $invoice = \App\Models\Invoice::factory()->create([
+            'organization_id' => $organization->id,
+            'business_id' => $data['business']->id,
+            'customer_id' => $data['customer']->id,
+            'status' => 'sent',
+            'subtotal_minor' => 10000,
+            'tax_total_minor' => 1600,
+            'grand_total_minor' => 11600,
+        ]);
+
+        $payload = [
+            'customer_id' => $data['customer']->id,
+            'invoice_id' => $invoice->id,
+            'credit_date' => now()->toDateString(),
+            'currency' => 'KES',
+            'reason' => 'Test credit',
+            'items' => [
+                [
+                    'product_id' => $data['product']->id,
+                    'description' => 'Test item',
+                    'quantity' => 1,
+                    'unit_price_minor' => 10000,
+                    'discount_minor' => 0,
+                    'tax_rate_percentage' => 16.0,
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/credit-notes', $payload);
+        $response->assertStatus(201);
+
+        $creditNote = \App\Models\CreditNote::where('organization_id', $organization->id)->first();
+        $this->postJson("/api/v1/credit-notes/{$creditNote->id}/issue");
+
+        $journalEntry = \App\Models\JournalEntry::where('reference_type', 'credit_note')
+            ->where('reference_id', $creditNote->id)
+            ->first();
+
+        $this->assertNotNull($journalEntry);
+
+        $totalDebits = \App\Models\JournalLine::where('journal_entry_id', $journalEntry->id)->sum('debit_minor');
+        $totalCredits = \App\Models\JournalLine::where('journal_entry_id', $journalEntry->id)->sum('credit_minor');
+
+        $this->assertEquals($totalDebits, $totalCredits);
+    }
+
+    public function test_debit_note_generates_balanced_journal(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = $this->actingAsAdminOf($organization);
+        $data = $this->seedTenantData($organization, $user);
+
+        $payload = [
+            'supplier_id' => null,
+            'debit_date' => now()->toDateString(),
+            'currency' => 'KES',
+            'reason' => 'Test debit',
+            'items' => [
+                [
+                    'product_id' => $data['product']->id,
+                    'description' => 'Test item',
+                    'quantity' => 1,
+                    'unit_cost_minor' => 5000,
+                    'discount_minor' => 0,
+                    'tax_rate_percentage' => 16.0,
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/debit-notes', $payload);
+        $response->assertStatus(201);
+
+        $debitNote = \App\Models\DebitNote::where('organization_id', $organization->id)->first();
+        $this->postJson("/api/v1/debit-notes/{$debitNote->id}/approve");
+
+        $journalEntry = \App\Models\JournalEntry::where('reference_type', 'debit_note')
+            ->where('reference_id', $debitNote->id)
+            ->first();
+
+        $this->assertNotNull($journalEntry);
+
+        $totalDebits = \App\Models\JournalLine::where('journal_entry_id', $journalEntry->id)->sum('debit_minor');
+        $totalCredits = \App\Models\JournalLine::where('journal_entry_id', $journalEntry->id)->sum('credit_minor');
+
+        $this->assertEquals($totalDebits, $totalCredits);
+    }
+
+    public function test_dashboard_returns_metrics(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = $this->actingAsAdminOf($organization);
+        $data = $this->seedTenantData($organization, $user);
+
+        $response = $this->getJson('/api/v1/dashboard');
+
+        $response->assertStatus(200)
+            ->assertJsonStructure(['data' => [
+                'total_sales',
+                'total_revenue',
+                'total_customers',
+                'total_products',
+                'outstanding_invoices',
+                'outstanding_bills',
+                'recent_sales',
+                'recent_invoices',
+            ]]);
+    }
+public function test_unauthorized_user_cannot_post_journal(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = User::factory()->create([
+            'organization_id' => $organization->id,
+            'business_id' => Business::factory()->create(['organization_id' => $organization->id])->id,
+            'role' => 'staff',
+            'permissions' => ['sales.view'],
+        ]);
+        Sanctum::actingAs($user);
+
+        $response = $this->postJson('/api/v1/journal-entries', [
+            'entry_date' => now()->toDateString(),
+            'notes' => 'Unauthorized',
+            'lines' => [
+                ['account_id' => (string) \App\Models\Account::factory()->create(['organization_id' => $organization->id])->id, 'debit_minor' => 1000, 'credit_minor' => 0],
+                ['account_id' => (string) \App\Models\Account::factory()->create(['organization_id' => $organization->id])->id, 'debit_minor' => 0, 'credit_minor' => 1000],
+            ],
+        ]);
+
+        $response->assertStatus(403);
+    }
+
+    public function test_credit_note_cannot_exceed_invoice_amount(): void
+    {
+        $organization = Organization::factory()->create();
+        $user = $this->actingAsAdminOf($organization);
+        $data = $this->seedTenantData($organization, $user);
+
+        $invoice = \App\Models\Invoice::factory()->create([
+            'organization_id' => $organization->id,
+            'business_id' => $data['business']->id,
+            'customer_id' => $data['customer']->id,
+            'status' => 'sent',
+            'grand_total_minor' => 10000,
+        ]);
+
+        $payload = [
+            'customer_id' => $data['customer']->id,
+            'invoice_id' => $invoice->id,
+            'credit_date' => now()->toDateString(),
+            'currency' => 'KES',
+            'reason' => 'Test',
+            'items' => [
+                [
+                    'product_id' => $data['product']->id,
+                    'description' => 'Test',
+                    'quantity' => 1,
+                    'unit_price_minor' => 20000,
+                    'discount_minor' => 0,
+                    'tax_rate_percentage' => 16.0,
+                ],
+            ],
+        ];
+
+        $response = $this->postJson('/api/v1/credit-notes', $payload);
+        $response->assertStatus(201);
+
+        $creditNote = \App\Models\CreditNote::where('organization_id', $organization->id)->first();
+        $this->assertTrue($creditNote->total_minor > $invoice->grand_total_minor);
+    }
 }

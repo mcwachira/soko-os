@@ -16,7 +16,10 @@ use App\Models\Sale;
 use App\Models\SaleItem;
 use App\Models\SyncOperation;
 use App\Models\Warehouse;
+use App\Models\Batch;
+use App\Models\SerialNumber;
 use App\Services\Accounting\AccountingService;
+use App\Services\InventoryService;
 use App\Services\OutboxService;
 use App\Services\ReceiptService;
 use App\Services\Tax\KraEtimsService;
@@ -120,6 +123,52 @@ class SaleController extends Controller
                             'message' => "Insufficient stock for '{$product->name}'. Available: ".rtrim(rtrim(number_format($available, 4, '.', ''), '0'), '.').", requested: {$item['quantity']}.",
                         ], 422);
                     }
+
+                    if ($product->track_inventory && $product->track_batches && empty($item['batch_number'])) {
+                        return response()->json([
+                            'message' => "Batch number is required for product '{$product->name}'.",
+                        ], 422);
+                    }
+
+                    if ($product->track_inventory && $product->track_serials && empty($item['serial_number'])) {
+                        return response()->json([
+                            'message' => "Serial number is required for product '{$product->name}'.",
+                        ], 422);
+                    }
+
+                    if (! empty($item['batch_number']) && ! empty($item['serial_number'])) {
+                        return response()->json([
+                            'message' => "Product '{$product->name}' cannot have both batch and serial numbers.",
+                        ], 422);
+                    }
+
+                    if (! empty($item['batch_number'])) {
+                        $batch = Batch::where('organization_id', $organizationId)
+                            ->where('product_id', $product->id)
+                            ->when($warehouse?->id, fn ($q) => $q->where('warehouse_id', $warehouse->id))
+                            ->where('batch_number', $item['batch_number'])
+                            ->lockForUpdate()
+                            ->first();
+
+                        if (! $batch || $batch->quantity < $item['quantity']) {
+                            return response()->json([
+                                'message' => "Insufficient batch stock for '{$product->name}'. Batch: {$item['batch_number']}, Available: ".($batch?->quantity ?? 0).", requested: {$item['quantity']}.",
+                            ], 422);
+                        }
+                    }
+
+                    if (! empty($item['serial_number'])) {
+                        $serial = SerialNumber::where('organization_id', $organizationId)
+                            ->where('product_id', $product->id)
+                            ->where('serial_number', $item['serial_number'])
+                            ->first();
+
+                        if (! $serial || $serial->status !== 'in_stock') {
+                            return response()->json([
+                                'message' => "Serial number '{$item['serial_number']}' is not available for product '{$product->name}'.",
+                            ], 422);
+                        }
+                    }
                 }
             }
 
@@ -171,6 +220,21 @@ class SaleController extends Controller
                 $rate = $item['tax_rate_percentage'] ?? 16.0;
                 $taxAmount = $rate > 0 ? (int) round(($itemTotal * $rate) / (100 + $rate)) : 0;
 
+                $warehouseForCogs = Warehouse::where('branch_id', $validated['branch_id'])
+                    ->where('organization_id', $organizationId)
+                    ->where('is_active', true)
+                    ->first();
+
+                $cogsMinor = 0;
+                if ($product->track_inventory) {
+                    $cogsMinor = InventoryService::calculateCogs(
+                        $product,
+                        $warehouseForCogs,
+                        $item['quantity'],
+                        'fifo'
+                    );
+                }
+
                 SaleItem::create([
                     'id' => Str::uuid()->toString(),
                     'organization_id' => $sale->organization_id,
@@ -185,6 +249,9 @@ class SaleController extends Controller
                     'tax_amount_minor' => $taxAmount,
                     'subtotal_minor' => $itemTotal - $taxAmount,
                     'total_minor' => $itemTotal,
+                    'batch_number' => $item['batch_number'] ?? null,
+                    'serial_number' => $item['serial_number'] ?? null,
+                    'cogs_minor' => $cogsMinor,
                 ]);
 
                 $this->createInventoryMovement($sale, $item, $user);
@@ -275,38 +342,23 @@ class SaleController extends Controller
             ->where('is_active', true)
             ->first();
 
-        $quantityChange = -abs($item['quantity']); // Negative for sale
+        $quantityChange = -abs($item['quantity']);
 
-        $stock = ProductStock::where('product_id', $item['product_id'])
-            ->where('organization_id', $sale->organization_id)
-            ->when($warehouse?->id, fn ($q) => $q->where('warehouse_id', $warehouse->id))
-            ->lockForUpdate()
-            ->first();
-
-        $balanceAfter = ($stock?->quantity_on_hand ?? 0) + $quantityChange;
-
-        if ($stock) {
-            $stock->update([
-                'quantity_on_hand' => $balanceAfter,
-                'quantity_available' => ($stock->quantity_available ?? 0) + $quantityChange,
-            ]);
-        }
-
-        InventoryMovement::create([
-            'id' => Str::uuid()->toString(),
-            'organization_id' => $sale->organization_id,
-            'business_id' => $sale->business_id,
-            'branch_id' => $sale->branch_id,
-            'warehouse_id' => $warehouse?->id,
-            'product_id' => $item['product_id'],
-            'movement_type' => 'sale',
-            'quantity_change' => $quantityChange,
-            'balance_after' => $balanceAfter,
-            'reference_type' => 'sale',
-            'reference_id' => $sale->id,
-            'notes' => "Sale {$sale->receipt_number}",
-            'created_by_user_id' => $user->id,
-        ]);
+        InventoryService::recordMovement(
+            $product,
+            $warehouse,
+            'sale',
+            $quantityChange,
+            [
+                'branch_id' => $sale->branch_id,
+                'reference_type' => 'sale',
+                'reference_id' => $sale->id,
+                'notes' => "Sale {$sale->receipt_number}",
+                'user_id' => $user->id,
+                'batch_number' => $item['batch_number'] ?? null,
+                'serial_number' => $item['serial_number'] ?? null,
+            ]
+        );
     }
 
     private function getCurrentStock(string $productId, ?string $warehouseId): float

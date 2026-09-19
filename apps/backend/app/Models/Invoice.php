@@ -67,4 +67,11 @@ class Invoice extends Model
     {
         return $this->hasMany(InvoiceItem::class);
     }
+
+    protected $appends = ['customer_name'];
+
+    public function getCustomerNameAttribute(): ?string
+    {
+        return $this->customer?->name;
+    }
 }
