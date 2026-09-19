@@ -32,5 +32,9 @@
   "packageManager": "pnpm@11.23.0",
   "engines": {
     "node": ">=22"
+  },
+  "dependencies": {
+    "dexie": "^4.4.6",
+    "uuid": "^14.0.2"
   }
 }

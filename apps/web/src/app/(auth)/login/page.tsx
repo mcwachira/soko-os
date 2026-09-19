@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
@@ -22,7 +22,7 @@ import { Loader2 } from 'lucide-react';
 
 type LoginFormValues = z.infer<typeof LoginSchema>;
 
-export default function LoginPage() {
+function LoginForm() {
   const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const loginMutation = useLogin();
@@ -116,5 +116,13 @@ export default function LoginPage() {
         </CardContent>
       </Card>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
