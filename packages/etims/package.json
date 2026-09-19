@@ -1,0 +1,27 @@
+{
+  "name": "@soko/etims",
+  "version": "1.0.0",
+  "description": "KRA eTIMS integration for Soko POS - supports sandbox, mock, and production modes",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "etims",
+    "kra",
+    "tax",
+    "fiscalization",
+    "kenya",
+    "pos",
+    "soko"
+  ],
+  "author": "Soko-OS",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}
