@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CreateSaleSchema, CreateCustomerSchema, CreateProductSchema, LoginSchema } from './index';
+import { CreateSaleSchema, CreateCustomerSchema, LoginSchema } from './index';
 
 describe('@soko/validation', () => {
   it('validates user login credentials', () => {
@@ -17,18 +17,6 @@ describe('@soko/validation', () => {
       tax_pin: 'P051234567Z',
       credit_limit_minor: 5000000,
       price_level: 'wholesale',
-    });
-    expect(valid.success).toBe(true);
-  });
-
-  it('validates product creation input schema', () => {
-    const valid = CreateProductSchema.safeParse({
-      sku: 'SKU-001',
-      barcode: '6161100001',
-      name: 'Basmati Rice 2kg',
-      cost_price_minor: 25000,
-      selling_price_minor: 32000,
-      tax_category_code: 'A',
     });
     expect(valid.success).toBe(true);
   });

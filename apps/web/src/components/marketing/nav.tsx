@@ -75,8 +75,8 @@ export function MarketingNav() {
           </div>
           <div className="hidden lg:flex items-center gap-3">
             <ThemeToggle />
-            <Link href="/customers">
-              <Button variant="outline" size="sm">Customers</Button>
+            <Link href="/login">
+              <Button variant="outline" size="sm">Sign In</Button>
             </Link>
             <Link href="/request-demo">
               <Button size="sm">Request a Demo</Button>
@@ -94,6 +94,9 @@ export function MarketingNav() {
               </Link>
             ))}
             <div className="pt-2 flex flex-col gap-2">
+              <Link href="/login" onClick={() => setIsOpen(false)}>
+                <Button variant="outline" className="w-full">Sign In</Button>
+              </Link>
               <Link href="/request-demo" onClick={() => setIsOpen(false)}>
                 <Button className="w-full">Request a Demo</Button>
               </Link>

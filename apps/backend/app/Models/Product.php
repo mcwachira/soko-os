@@ -46,6 +46,16 @@ class Product extends Model
         return $this->belongsTo(Category::class);
     }
 
+    public function stocks()
+    {
+        return $this->hasMany(ProductStock::class);
+    }
+
+    public function inventoryMovements()
+    {
+        return $this->hasMany(InventoryMovement::class);
+    }
+
     public function getAccountingId(string $provider): ?string
     {
         $ids = $this->accounting_ids ?? [];
