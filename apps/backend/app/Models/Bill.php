@@ -66,4 +66,11 @@ class Bill extends Model
     {
         return $this->hasMany(BillItem::class);
     }
+
+    protected $appends = ['supplier_name'];
+
+    public function getSupplierNameAttribute(): ?string
+    {
+        return $this->supplier?->name;
+    }
 }

@@ -7,8 +7,9 @@ use App\Models\Bill;
 use App\Models\BillItem;
 use App\Http\Requests\StoreBillRequest;
 use App\Http\Requests\UpdateBillRequest;
+use App\Services\Accounting\JournalService;
 use Illuminate\Http\Request;
-use Illuminate\Support\DB;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class BillController extends Controller
@@ -191,5 +192,25 @@ class BillController extends Controller
         $bill->delete();
 
         return response()->json(['message' => 'Bill deleted']);
+    }
+
+    public function approve(Request $request, string $id, JournalService $journalService)
+    {
+        $bill = Bill::where('organization_id', $request->user()->organization_id)
+            ->findOrFail($id);
+
+        $this->authorize('update', $bill);
+
+        if (! in_array($bill->status, ['draft', 'pending'])) {
+            return response()->json(['message' => 'Bill is not in a status that can be approved'], 422);
+        }
+
+        $bill->update([
+            'status' => 'approved',
+        ]);
+
+        $journalService->postBillJournal($bill->organization_id, $bill->business_id, $bill);
+
+        return response()->json(['data' => $bill->load('items.product')]);
     }
 }
