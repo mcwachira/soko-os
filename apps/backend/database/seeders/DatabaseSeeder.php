@@ -78,10 +78,10 @@ class DatabaseSeeder extends Seeder
                 'is_active' => true,
             ]);
         }
+        $category = Category::where('business_id', $business->id)->first();
 
-        $category = $business->categories()->first();
         if (! $category) {
-            $category = Category::factory()->create([
+            $category = Category::create([
                 'organization_id' => $org->id,
                 'business_id' => $business->id,
                 'name' => 'General',
@@ -89,7 +89,7 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        if ($business->products()->count() === 0) {
+        if ($category && $category->products()->count() === 0) {
             Product::factory()->count(20)->create([
                 'organization_id' => $org->id,
                 'business_id' => $business->id,
@@ -103,5 +103,6 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->call(RoleSeeder::class);
+        $this->call(DemoUserSeeder::class);
     }
 }
