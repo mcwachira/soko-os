@@ -1,0 +1,31 @@
+{
+  "name": "@soko/printing",
+  "version": "1.0.0",
+  "description": "Receipt printing utilities for Soko POS - supports thermal printers (ESC/POS), browser print, and PDF generation",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "receipt",
+    "printing",
+    "thermal",
+    "escpos",
+    "pos",
+    "soko"
+  ],
+  "author": "Soko-OS",
+  "license": "MIT",
+  "peerDependencies": {
+    "jspdf": "^2.5.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0",
+    "jspdf": "^2.5.0",
+    "@types/jspdf": "^2.0.0"
+  }
+}

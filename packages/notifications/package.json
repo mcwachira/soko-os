@@ -1,0 +1,27 @@
+{
+  "name": "@soko/notifications",
+  "version": "1.0.0",
+  "description": "Multi-channel notifications for Soko POS - Email, SMS, WhatsApp, Push with sandbox/mock support",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint src --ext .ts"
+  },
+  "keywords": [
+    "notifications",
+    "email",
+    "sms",
+    "whatsapp",
+    "push",
+    "pos",
+    "soko"
+  ],
+  "author": "Soko-OS",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^1.0.0"
+  }
+}
