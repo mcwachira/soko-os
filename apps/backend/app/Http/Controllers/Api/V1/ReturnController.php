@@ -73,10 +73,19 @@ class ReturnController extends Controller
                     ->where('sale_id', $sale->id)
                     ->firstOrFail();
 
-                // Validate quantity does not exceed original
-                if ($item['quantity'] > $saleItem->quantity) {
+                // Calculate already returned quantity for this sale item
+                $alreadyReturned = ReturnItem::where('sale_item_id', $saleItem->id)
+                    ->whereHas('return', function ($q) {
+                        $q->where('status', '!=', 'cancelled');
+                    })
+                    ->sum('quantity');
+
+                $availableQuantity = $saleItem->quantity - $alreadyReturned;
+
+                // Validate quantity does not exceed available (original - already returned)
+                if ($item['quantity'] > $availableQuantity) {
                     return response()->json([
-                        'message' => 'Return quantity exceeds original sale quantity for item: '.$saleItem->name,
+                        'message' => 'Return quantity exceeds available quantity for item: '.$saleItem->name.' (Original: '.$saleItem->quantity.', Already returned: '.$alreadyReturned.', Available: '.$availableQuantity.')',
                     ], 422);
                 }
 

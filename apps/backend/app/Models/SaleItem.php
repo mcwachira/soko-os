@@ -24,6 +24,9 @@ class SaleItem extends Model
         'tax_amount_minor',
         'subtotal_minor',
         'total_minor',
+        'batch_number',
+        'serial_number',
+        'cogs_minor',
     ];
 
     protected $casts = [
